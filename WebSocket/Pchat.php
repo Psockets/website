@@ -4,9 +4,13 @@ class Pchat extends WebSocketComponent {
     public static $PROTOCOL = "pchat";
 
     private $clients;
+    private $history;
+    private $historyLimit;
 
     public function onLoad($ip, $port, $host) {
         $this->clients = array();
+        $this->history = array();
+        $this->historyLimit = 200;
         $this->server->log->debug("SimpleEcho component loaded on $ip:$port for host $host");
     }
 
@@ -17,7 +21,8 @@ class Pchat extends WebSocketComponent {
         $con->send(json_encode(array(
             "event" => "welcome",
             "clients" => array_keys($this->clients),
-            "me" => $id
+            "me" => $id,
+            "history" => $this->history
         )));
 
         $jsonNewClient = json_encode(array(
@@ -50,7 +55,14 @@ class Pchat extends WebSocketComponent {
     }
 
     public function onMessage($con, $data, $type) {
+        if ($type != 'text') return;
+
         $id = $con->getConnection()->id;
+
+        $this->history[] = "guest#$id: $data";
+        if (count($this->history) > $this->historyLimit) {
+            array_shift($this->history);
+        }
 
         $json = json_encode(array(
             "event" => "new_message",

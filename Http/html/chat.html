@@ -45,7 +45,9 @@
       case 'welcome':
         clients = msg.clients;
         myId = msg.me;
+        messages = msg.history;
         updateClientsList();
+        updateMessageArea();
         break;
       case 'clients_update':
         clients = msg.clients;
@@ -71,13 +73,17 @@
     clientList.innerHTML = html;
   }
 
+  var updateMessageArea = function() {
+    msgArea.innerHTML = messages.join("\n\n");
+    msgArea.scrollTop = msgArea.scrollHeight;
+  }
+
   var pushMessage = function(from, msg) {
     messages.push(from + ': ' + msg);
     if (messages.length > historyLength) {
       messages.shift();
     }
-    msgArea.innerHTML = messages.join("\n\n");
-    msgArea.scrollTop = msgArea.scrollHeight;
+    updateMessageArea();
   }
 
   msgInput.addEventListener('keyup', function(e) {
