@@ -1,0 +1,60 @@
+    <div class="container">
+        <p>Tests were performed using ApacheBench Version 2.3 and PHP 7.2 on AMD Ryzen 7 1700 @ 3.8 GHz. Each test was repeated 3 times and the average result was taken.</p>
+        <p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Software</th>
+                        <th>No. of req</th>
+                        <th>Concurrency</th>
+                        <th>Req/sec</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Node JS</td>
+                        <td>100000</td>
+                        <td>50</td>
+                        <td>21456</td>
+                    </tr>
+                    <tr>
+                        <td>Psockets</td>
+                        <td>100000</td>
+                        <td>50</td>
+                        <td>30466</td>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+        
+        <p>Node JS code</p>
+        <p><pre><code class="language-js">
+var http = require('http');                                                                                                                                                                                                                                                    
+var url = require('url');                                                                                                                                                                                                                                                      
+var server;                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                               
+server = http.createServer(function (req, res) {                                                                                                                                                                                                                               
+  var urlParts = url.parse(req.url, true);                                                                                                                                                                                                                                     
+  var query = urlParts.query;                                                                                                                                                                                                                                                  
+  var result = parseInt(query.a) + parseInt(query.b);                                                                                                                                                                                                                          
+  res.end(result.toString());                                                                                                                                                                                                                                                  
+});                                                                                                                                                                                                                                                                            
+                                                                                                                                                                                                                                                                               
+server.listen(9999);
+        </code></pre></p>
+        
+        <p>Psockets code</p>
+        <p><pre><code class="language-php">
+class Adder extends HttpComponent {                                                                                                                                                                                                                                            
+    public static $PATH = '/';                                                                                                                                                                                                                                                 
+                                                                                                                                                                                                                                                                               
+    public function onRequest($con, $request) {                                                                                                                                                                                                                                
+        $query = $request->getQuery();                                                                                                                                                                                                                                         
+        $result = ((int)$query['a'] ?? 0) + ((int)$query['b'] ?? 0);                                                                                                                                                                                                           
+        $con->send(new HttpResponse($request, $result));                                                                                                                                                                                                                       
+        $con->close();                                                                                                                                                                                                                                                         
+        return true;                                                                                                                                                                                                                                                           
+    }                                                                                                                                                                                                                                                                          
+} 
+        </code></pre></p>
+    </div> <!-- /container -->

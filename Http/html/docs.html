@@ -1,0 +1,53 @@
+<div class="container" >
+    <h2>What it is</h2>
+    <p>This is a small, high performance framework designed to help you build servers. The framework takes care of managing the server sockets, listening for new connections, sending data to and receving data from these connections. It uses events to notify your code when a client is connecting/disconnecting or when data is available from a particular client. Your code can then do what it needs to do with that data and reply to the client. The client communication is abstracted behind connection objects and is handled by the framework, so you don't have to deal with it.</p>
+    
+    <p>The framework also provides you with a file structure to organize your projects. Your code goes in either the <code>wrappers/</code> directory or the <code>app/</code> depending on what you need to build. Implementations of TCP based protocols (like HTTP, WebSocket, SMTP, etc.) go in the <code>wrappers/</code> dir. Application level code that in turn works over those protocols goes in the <code>app/</code> directory. For example if you want to make REST API that works over HTTP, the code for it will go in the <code>app/</code> directory.</p>
+    <br />
+    
+    <h2>What it isn't</h2>
+    <p>This is not an MVC framework. You should NOT expect to run standard web applications (like Wordpress) on it. It is not stateless and the process does not die after servicing a an HTTP request for example. DO NOT call <code>exit</code> in your code or your server will stop and nobody will be able to connect until you restart it!</p>
+    <br />
+    
+    <h2>Getting started</h2>
+    <p>First you need to decide whether you need to build a wrapper or a component (components work over the wrappers and go in the <code>app/</code> directory). Usually, you will build your wrapper first and then build your app (component) logic on top of that wrapper. The framework already provides wrappers for HTTP, WebSocket and SMTP, so if you are going to be building on top of one of these protocols you can go straight to building the app (component). Please read through the <a href="/docs-wrapper" class="underlined">Building a Wrapper</a> and <a href="/docs-component" class="underlined">Building a Component</a> pages for further information on how to do these things.</p>
+    <br />
+    
+    <h2>Starting the server</h2>
+    <p>The framework can manage an arbitrary amount of servers, but please be mindful that if an application running on server A responds slower to requests than an application running on server B, then this can affect the performance of the application on server B. The way you configure what servers to run is through the <code>config.php</code> file. Here is what the default config file looks like:
+      <pre><code class="language-php">
+$server_config = array(
+    65000 => array(
+        'WebSocket' => array(
+            'hosts' => array(
+                'localhost' => array('WebChat', 'SimpleEcho'),
+            )
+        ),
+        'ssl' => array(
+            'cert_file' => '',
+            'privkey_file' => '',
+            'passphrase' => ''
+        )
+    ),
+    65001 => array(
+        'RawTcp' => array()
+    ),
+    65002 => array(
+        'Http' => array(
+            'hosts' => array(
+                'localhost' => array('HelloWorld', 'Maintenance'),
+            )
+        ),
+        'ssl' => array(
+            'cert_file' => '',
+            'privkey_file' => '',
+            'passphrase' => ''
+        )
+    )
+);
+      </code></pre>
+
+      This is an array that describes which ports to listen on and what wrappers to use for each port. You can optionally add wrapper specific config, or if this is not suported use an empty array. The config above starts 3 servers one on each of these ports 65000, 65001 and 65002. On port 65000 we have a WebSocket server, then the RawTcp wrapper is used for port 65001 (this wrapper does nothing basically) and finally we have an HTTP wrapper on port 65002.
+    </p>
+    <br />
+</div>

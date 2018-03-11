@@ -1,0 +1,30 @@
+    <div class="container">
+
+      <!-- Main component for a primary marketing message or call to action -->
+      <div class="jumbotron">
+        <h1>Psockets comes from PHP sockets not POSIX sockets</h1>
+        <h3>The domain was available and I just coudn't resist using it to cause unnecessary confusion.</h3>
+        <p></p>
+        <p>A high performance networking framework aiming to speed up the development of TCP based servers.</p>
+        <p>HTTP and WebSocket support is already provided with the framework, so you can start working on your web based projects right away.</p>
+        <p></p>
+        <p>A simple Hello World HTTP application looks like this:</p>
+        <pre><code class="language-php">
+  class HelloWorld extends HttpComponent {                                                                                                                                                                                                                                   
+      public static $PATH = '/';                                                                                                                                                                                                                                             
+                                                                                                                                                                                                                                                                             
+      public function onRequest($con, $request) {                                                                                                                                                                                                                            
+          if ($request->getPath() == '/') {                                                                                                                                                                                                                                  
+              $con->send(new HttpResponse($request, "Hello World!"));                                                                                                                                                                                                        
+              $con->close();                                                                                                                                                                                                                                                 
+              return true;                                                                                                                                                                                                                                                   
+          }                                                                                                                                                                                                                                                                  
+                                                                                                                                                                                                                                                                             
+          return false;                                                                                                                                                                                                                                                      
+      }                                                                                                                                                                                                                                                                      
+  }  
+        </code></pre>
+        
+        <p>If you are interested in benchmarks <a href="/performance" class="underlined">go to the performance tests</a></p>
+      </div>
+    </div> <!-- /container -->
