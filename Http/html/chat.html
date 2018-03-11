@@ -77,6 +77,7 @@
       messages.shift();
     }
     msgArea.innerHTML = messages.join("\n\n");
+    msgArea.scrollTop = msgArea.scrollHeight;
   }
 
   msgInput.addEventListener('keyup', function(e) {
