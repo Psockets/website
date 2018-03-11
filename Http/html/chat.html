@@ -1,0 +1,90 @@
+<div class="container">
+  <div class="col-md-3">
+    <fieldset>
+      <legend>People Online</legend>
+      <ul id="clientsList" style="list-style: none; padding-left: 10px">
+        <li>guest#123</li>
+        <li>guest#124</li>
+        <li>guest#125</li>
+      </ul>
+    </fieldset>
+  </div>
+  <div class="col-md-9">
+    <div class="row">
+      <div class="col-md-12">
+        <pre id="msgArea" style="height: 400px">guest#123: Hello World!</pre>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <input type="text" id="msgInput" class="form-input" style="width: 100%" />
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function() {
+  var clients = [];
+  var messages = [];
+  var myId = 0;
+  var historyLength = 200;
+  var clientList = document.getElementById("clientsList");
+  var msgArea = document.getElementById("msgArea");
+  var msgInput = document.getElementById("msgInput");
+
+  var sock = new WebSocket("wss://psockets.com:4433/", "pchat");
+
+  sock.onopen = function(e) {
+    console.log("Connection established");
+  }
+
+  sock.onmessage = function(e) {
+    console.log("Message received");
+    var msg = JSON.parse(e.data);
+    switch(msg.event) {
+      case 'welcome':
+        clients = msg.clients;
+        myId = msg.me;
+        updateClientsList();
+        break;
+      case 'clients_update':
+        clients = msg.clients;
+        pushMessage('server', msg.message);
+        updateClientsList();
+        break;
+      case 'new_message':
+        clients = msg.clients;
+        pushMessage("guest#" + msg.client, msg.message);
+        break;
+    }
+  }
+
+  sock.onclose = function() {
+    console.log("Connection to the server was closed");
+  }
+
+  var updateClientsList = function() {
+    var html = "";
+    for(var x = 0; x < clients.length; x++) {
+      html += "<li>guest#" + clients[x] + "</li>";
+    }
+    clientList.innerHTML = html;
+  }
+
+  var pushMessage = function(from, msg) {
+    messages.push(from + ': ' + msg);
+    if (messages.length > historyLength) {
+      messages.shift();
+    }
+    msgArea.innerHTML = messages.join("\n\n");
+  }
+
+  msgInput.addEventListener('keyup', function(e) {
+    if (e.keyCode == 13 && msgInput.value.length) {
+      sock.send(msgInput.value);
+      pushMessage('me', msgInput.value);
+      msgInput.value = "";
+    }
+  });
+})();
+</script>
