@@ -25,7 +25,7 @@
       </div>
       <div id="datastream">
         <p><h3>DataStream</h3></p>
-        <p><pre class="label label-default">DataStream::getChunk($chunkSize)</pre> - Called when the server is requesting a chunk of data to send. You are expected to return string no longer than $chunkSize. Note that it is not guaranteed that all of the requested data will be send, so do not advance your data pointers yet. Wait for the call to <pre class="label label-default">advanceBy()</pre> for this.</p>
+        <p><pre class="label label-default">DataStream::getChunk($chunkSize)</pre> - Called when the server is requesting a chunk of data to send. You are expected to return string no longer than $chunkSize. Note that it is not guaranteed that all of the requested data will be sent, so do not advance your data pointers yet. Wait for the call to <pre class="label label-default">advanceBy()</pre> for this.</p>
         <p><pre class="label label-default">DataStream::advanceBy($bytes)</pre> - Called after data has been sent and <pre class="label label-default">$bytes</pre> is the number of bytes that have been sent. You should advance your data pointers by <pre class="label label-default">$bytes</pre> ahead.</p>
         <p><pre class="label label-default">DataStream::eof()</pre> - Called when the server wants to check whether there is more data in this stream. Return FALSE if you still have data to send from this stream or TRUE otherwise.</p>
       </div>

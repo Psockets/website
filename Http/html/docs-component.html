@@ -1,0 +1,98 @@
+<div class="container" >
+  <h1>What is a component?</h1>
+  <p>
+  If a wrapper is a the piece of code that can transmit data using a specific protocol, for example WebSocket, a component is the code that will do some work using the received data. For example when the WebSocket wrapper receive a message it will forward it to a component. The component may then decide to forward this data to another client for example. This will be a perfectly valid case for a WebSocket based chat in fact. In order to illustrate how components work, we will build another chat, but this time we will use WebSockets.
+  </p>
+
+  <h1>Before we start</h1>
+  <p>
+  Please note that support for components is something that you need to build into your wrappers. You can use the built-in wrappers as examples.
+  </p>
+
+  <h3>The WebSocketComponent base class</h3>
+  <p>
+  Your WebSocket based component classes will all be inheriting from the abstract <a href="api#websocketcomponent" class="underlined">WebSocketComponent class</a>. Please go get familiar with it before you continue.
+  </p>
+
+  <h3>Where to put your component file?</h3>
+  <p>
+  Components must be placed in the <code>app/</code> directory under a subdirectory of their wrapper. For example WebSocket based components go into <code>app/WebSocket/</code>. The name of our component will be WebChat, so we should put our code inside the file <code>app/WebSocket/WebChat.php</code>.
+  </p>
+
+  <h3>WebChat.php</h3>
+  <p>
+  Ok, now that we have the component file in the correct place, lets see what it would look like. This component will register the <code>webchat</code> protocol in the server, so only WebSocket clients requesting this protocol will be connected to this component.
+  <pre><code class="language-php">
+class WebChat extends WebSocketComponent {
+    public static $PROTOCOL = "webchat";
+
+    private $clients = array();
+
+    public function onConnect($con) {
+        $this->clients[$con->id] = $con;
+    }
+
+    public function onDisconnect($con) {
+        unset($this->clients[$con->id]);
+    }
+
+    public function onMessage($con, $data, $dataType = 'text') {
+        foreach ($this->clients as $client) {
+            if ($client->id != $con->id) {
+                $client->send($data, ($dataType == 'binary' ? true : false));
+            }
+        }
+    }
+}
+  </code></pre>
+  </p>
+
+  <h3>Sample config.php</h3>
+  <p>
+  Suppose that we want to start our server at port 8080 and we want to enable the WebChat component for the host <code>localhost</code> we would have the following config:
+  <pre><code class="language-php">
+$server_config = array(
+    8080 => array(
+        'WebSocket' => array(
+            'hosts' => array(
+                'localhost' => array('WebChat'),
+            )
+        ),
+        'ssl' => array(
+            'cert_file' => '',
+            'privkey_file' => '',
+            'passphrase' => ''
+        )
+    )
+);
+  </code></pre>
+  </p>
+
+  <h3>Testing it out</h3>
+  <p>
+  Run the server.php file in a terminal like so <code>php server.php</code>. Run this JavaScript snippet in a browser. It will create 2 WebSocket connections to our server and each of them will send a message. Connection 0 should receive the message from Connection 1 and log it to the console.
+  <pre><code class="language-javascript">
+for (var x = 0; x < 2; x++) {
+    (function(x) {
+        let sock = new WebSocket("ws://127.0.0.1:8080/", "webchat");
+
+        sock.onopen = function(e) {
+            sock.send("Hello from connection " + x);
+        }
+
+        sock.onmessage = function(e) {
+            console.log("Connection " + x + " received data: " + e.data);
+        }
+
+        sock.onclose = function() {
+            console.log("Connection closed");
+        }
+    })(x);
+}
+  </code></pre>
+  </p>
+
+  <p>
+  That's it. If you have any questions feel free to open an issue in <a href="https://github.com/Psockets/psockets/issues" class="underlined">GitHub</a>.
+  </p>
+</div>
