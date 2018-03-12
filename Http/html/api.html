@@ -7,6 +7,11 @@
         <li><a href="#datastream">DataStream</a></li>
         <li><a href="#connection">Connection</a></li>
         <li><a href="#wrapper">Wrapper</a></li>
+        <li><a href="#websockconnection">WebSockConnection</a></li>
+        <li><a href="#websocketcomponent">WebSocketComponent</a></li>
+        <li><a href="#httprequest">HttpRequest</a></li>
+        <li><a href="#httpresponse">HttpResponse</a></li>
+        <li><a href="#httpcomponent">HttpComponent</a></li>
       </ul>
     </div>
     <div class="col-md-9">
@@ -47,6 +52,48 @@
         <p><pre class="label label-default">Wrapper::onDisconnect(<a href="#connection" class="underlined">Connection</a> $con)</pre> - Called after a client has disconnected from the server.</p>
         <p><pre class="label label-default">Wrapper::onData(<a href="#connection" class="underlined">Connection</a> $con, $data)</pre> - Called when new data is present from the client described using the connection $con. The $data variable is a string holding the new data. Please keep in mind that if you expect X bytes of data, you may get it in several chunks. So be sure to check buffer the data until you receive the expected amount.</p>
         <p><pre class="label label-default">Wrapper::onStop()</pre> - Called when the server is being stopped. Think of this as a destructor.</p>
+      </div>
+      <div id="websockconnection">
+        <p><h3>WebSockConnection</h3></p>
+        <p><pre class="label label-default">WebSockConnection::id</pre> - The unique ID for this connection.</p>
+        <p><pre class="label label-default">WebSockConnection::ip</pre> - The IP address of the client represented by the WebSockConnection object.</p>
+        <p><pre class="label label-default">WebSockConnection::endpoint</pre> - The endpoint for the connection. This is specified by the client when connecting. You can use this to separate chat clients in rooms for example.</p>
+        <p><pre class="label label-default">WebSockConnection::send(String $data[, $send_as_binary = false])</pre> - Sends <pre class="label label-default">$data</pre> to the client represented by the WebSockConnection object. Returns a <a href="#promise" class="underlined">Promise</a>.</p>
+        <p><pre class="label label-default">WebSockConnection::isSecure()</pre> - Returns TRUE if the connection is secure (SSL is enable) and FALSE otherwise.</p>
+        <p><pre class="label label-default">WebSockConnection::close()</pre> - Closes the connection.</p>
+      </div>
+      <div id="websocketcomponent">
+        <p><h3>WebSocketComponent</h3></p>
+        <p><pre class="label label-default">WebSocketComponent::$PROTOCOL</pre> - A string field used when the server registers your component. Only clients that request this protocol will be connected to this component instance.</p>
+        <p><pre class="label label-default">WebSocketComponent::$server</pre> - A reference to the server object..in case you need it..you would probably not need it though.</p>
+        <p><pre class="label label-default">WebSocketComponent::onLoad($ip, $port, $host)</pre> - Called when the component gets loaded from the server. In most cases you can use this method instead of a constructor.</p>
+        <p><pre class="label label-default">WebSocketComponent::onConnect(<a href="#websockconnection" class="underlined">WebSockConnection</a> $con)</pre> - Called when a new client is connected and SSL (if configured) is negotiated.</p>
+        <p><pre class="label label-default">WebSocketComponent::onDisconnect(<a href="#websockconnection" class="underlined">WebSockConnection</a> $con)</pre> - Called after a client has disconnected from the server.</p>
+        <p><pre class="label label-default">WebSocketComponent::onMessage(<a href="#websockconnection" class="underlined">WebSockConnection</a> $con, $data, $dataType)</pre> - Called when new data is present from the client described using the connection $con. The $dataType can be either 'text' or 'binary' which tells you whether the received data should be treated as text or binary.</p>
+      </div>
+      <div id="httprequest">
+        <p><h3>HttpRequest</h3></p>
+        <p><pre class="label label-default">HttpRequest::getCookie($name)</pre> - Returns the value of the cookie specified by $name or NULL if there is no such cookie in the request.</p>
+        <p><pre class="label label-default">HttpRequest::getHeader($name)</pre> - Returns the value of the header specified by $name or NULL if there is no such header in the request.</p>
+        <p><pre class="label label-default">HttpRequest::getHttpVersion()</pre> - Returns the HTTP version used in the request.</p>
+        <p><pre class="label label-default">HttpRequest::getHeaders()</pre> - Returns an associative array with all headers from the request.</p>
+        <p><pre class="label label-default">HttpRequest::getMethod()</pre> - Returns the HTTP method used in the request. Example "GET".</p>
+        <p><pre class="label label-default">HttpRequest::getPath()</pre> - Returns the path used in the request.</p>
+        <p><pre class="label label-default">HttpRequest::getQuery()</pre> - Returns an associative array with the query parameters used in the request.</p>
+        <p><pre class="label label-default">HttpRequest::getPayload()</pre> - Returns the payload data used in the request.</p>
+      </div>
+      <div id="httpresponse">
+        <p><h3>HttpResponse</h3></p>
+        <p><pre class="label label-default">HttpResponse::setHeader($name, $value)</pre> - Sets a header. This will not work if you call it after a call to HttpResponse::write(). </p>
+        <p><pre class="label label-default">HttpResponse::setStatusCode($code[, $message = NULL])</pre> - Sets the status code for the response. Example 301 Moved Permanently.</p>
+        <p><pre class="label label-default">HttpResponse::write($data)</pre> - Send the $data as a reponse to the client. Returns a promise. For $data can be only string, but soon (file)streams will be supported also.</p>
+      </div>
+      <div id="httpcomponent">
+        <p><h3>HttpComponent</h3></p>
+        <p><pre class="label label-default">HttpComponent::$PATH</pre> - A string field used when the server registers your component. Only clients that request this path will be forwarded to this component instance. This means that you need to code a separate component for each path that you want to support. When multiple components are registered, the one with the longest match will be selected to handle a request.</p>
+        <p><pre class="label label-default">HttpComponent::$server</pre> - A reference to the server object..in case you need it..you would probably not need it though.</p>
+        <p><pre class="label label-default">HttpComponent::onLoad($ip, $port, $host)</pre> - Called when the component gets loaded from the server. In most cases you can use this method instead of a constructor.</p>
+        <p><pre class="label label-default">HttpComponent::onRequest(<a href="#connection" class="underlined">Connection</a> $con, <a href="#httprequest" class="underlined">HttpRequest</a> $request, <a href="#httpresponse" class="underlined">HttpResponse</a> $response)</pre> - Called when a new request hits the server. The $con parameter is a reference to the connection which made the request. The $request is an object describing the request. The $response is an object that you will use to send back a response.</p>
       </div>
     </div>
   </div>
