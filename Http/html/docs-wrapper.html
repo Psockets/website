@@ -1,0 +1,74 @@
+<div class="container" >
+  <h1>Building a Wrapper</h1>
+  <p>
+  Learning by example and explaining using code samples seem to be very effective in programming, so I will try to explain how wrappers work with a simple example. And of course it is going to be a chat example.. It will be the simplest of chats - you connect and start typing. Each message that you send is going to be broadcasted to the rest of the clients currently connected to the server.
+  </p>
+
+  <h3>The Wrapper base class</h3>
+  <p>
+  Your wrappers classes will all be inheriting from the abstract <a href="api#wrapper" class="underlined">Wrapper class</a>. Please go get familiar with it before you continue.
+  </p>
+
+  <h3>Where to put your wrapper file?</h3>
+  <p>
+  Each wrapper gets its own directory unders the <code>wrappers/</code> directory. The name of our wrapper will be DemoChat, so we should put our files inside <code>wrappers/DemoChat/</code>. The main file should be <code>wrappers/DemoChat/DemoChat.php</code>.
+  </p>
+
+  <h3>DemoChat.php</h3>
+  <p>
+  Ok, now that we have the wrapper file in the correct place, lets see what it would look like.
+  <pre><code class="language-php">
+class DemoChat extends Wrapper {
+    private $clients;
+
+    public function init() {
+        $this->clients = array();
+    }
+
+    public function onConnect($con) {
+        $this->clients[$con->id] = $con;
+    }
+
+    public function onDisconnect($con) {
+        unset($this->clients[$con->id]);
+    }
+
+    public function onData($con, $data) {
+        foreach ($this->clients as $client) {
+            if ($client->id != $con->id) {
+                $client->send("> " . $data);
+            }
+        }
+    }
+
+    public function onStop() {}
+}
+  </code></pre>
+  </p>
+
+  <h3>Sample config.php</h3>
+  <p>
+  Suppse that we want to start our server at port 8080 we would have the following config:
+  <pre><code class="language-php">
+$server_config = array(
+    8080 => array(
+        'DemoChat' => array(),
+        'ssl' => array(
+            'cert_file' => '',
+            'privkey_file' => '',
+            'passphrase' => ''
+        )
+    )
+);
+  </code></pre>
+  </p>
+
+  <h3>Testing it out</h3>
+  <p>
+  Run the server.php file in a terminal like so <code>php server.php</code> then open two other teminals. Use telnet to connect to the server on both of them like so <code>telnet localhost 8080</code>. Type something in one of them and hit &lt;enter&gt;. You should see your message in the other terminal.
+  </p>
+
+  <p>
+  That's it. If you have any questions feel free to open an issue in <a href="https://github.com/Psockets/psockets/issues" class="underlined">GitHub</a>.
+  </p>
+</div>

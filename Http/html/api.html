@@ -1,3 +1,53 @@
 <div class="container">
-    <h3>API docs are for the weak</h3>
+  <div class="row">
+    <div class="col-md-3">
+      <ul style="list-style: none">
+        <li><a href="#log">Log</a></li>
+        <li><a href="#promise">Promise</a></li>
+        <li><a href="#datastream">DataStream</a></li>
+        <li><a href="#connection">Connection</a></li>
+        <li><a href="#wrapper">Wrapper</a></li>
+      </ul>
+    </div>
+    <div class="col-md-9">
+      <div id="log">
+        <p><h3>Log</h3></p>
+        <p><pre class="label label-default">Log::debug()</pre> - Use this to log debug messages.</p>
+        <p><pre class="label label-default">Log::error()</pre> - Use this to log error messages.</p>
+      </div>
+      <div id="promise">
+        <p><h3>Promise</h3></p>
+        <p><pre class="label label-default">Promise::then($success, [$fail])</pre> - Chainable. Use this to register success and fail handlers for the promise. The success handler will be called when the Promise is resolved and the fail handler will be called when the Promise is rejected. This method can be called more than once if you want to chain multiple handlers.</p>
+        <p><pre class="label label-default">Promise::catch($fail)</pre> - Chainable. Use this to register a fail handler for the promise. The fail handler will be called when the Promise is rejected. This method can be called more than once if you want to chain multiple fail handlers.</p>
+        <p><pre class="label label-default">Promise::finally($finally)</pre> - Chainable. Use this to register a finally handler for the promise. The finally handler will be called when the Promise is either resolved or rejected. This method can be called more than once if you want to chain multiple finally handlers.</p>
+        <p><pre class="label label-default">Promise::resolve($data)</pre> - Call this when you need to resolve a Promise. The success handlers will receive the <pre class="label label-default">$data</pre> as their only argument.</p>
+        <p><pre class="label label-default">Promise::reject(Exception $exception)</pre> - Call this when you need to reject a Promise. The fail handlers will receive the <pre class="label label-default">$exception</pre> as their only argument.</p>
+      </div>
+      <div id="datastream">
+        <p><h3>DataStream</h3></p>
+        <p><pre class="label label-default">DataStream::getChunk($chunkSize)</pre> - Called when the server is requesting a chunk of data to send. You are expected to return string no longer than $chunkSize. Note that it is not guaranteed that all of the requested data will be send, so do not advance your data pointers yet. Wait for the call to <pre class="label label-default">advanceBy()</pre> for this.</p>
+        <p><pre class="label label-default">DataStream::advanceBy($bytes)</pre> - Called after data has been sent and <pre class="label label-default">$bytes</pre> is the number of bytes that have been sent. You should advance your data pointers by <pre class="label label-default">$bytes</pre> ahead.</p>
+        <p><pre class="label label-default">DataStream::eof()</pre> - Called when the server wants to check whether there is more data in this stream. Return FALSE if you still have data to send from this stream or TRUE otherwise.</p>
+      </div>
+      <div id="connection">
+        <p><h3>Connection</h3></p>
+        <p><pre class="label label-default">Connection::id</pre> - The unique ID for this connection.</p>
+        <p><pre class="label label-default">Connection::ip</pre> - The IP address of the client represented by the Connection object.</p>
+        <p><pre class="label label-default">Connection::send(DataStream | String $data)</pre> - Sends <pre class="label label-default">$data</pre> to the client represented by the Connection object. Returns a <a href="#promise" class="underlined">Promise</a>.</p>
+        <p><pre class="label label-default">Connection::isSecure()</pre> - Returns TRUE if the connection is secure (SSL is enable) and FALSE otherwise.</p>
+        <p><pre class="label label-default">Connection::close()</pre> - Closes the connection.</p>
+      </div>
+      <div id="wrapper">
+        <p><h3>Wrapper</h3></p>
+        <p><pre class="label label-default">Wrapper::config</pre> - The config array as you have defined it in the config file.</p>
+        <p><pre class="label label-default">Wrapper::server</pre> - A reference to the server object..in case you need it..you would probably not need it though.</p>
+        <p><pre class="label label-default">Wrapper::log</pre> - A reference to the <a href="#log" class="underlined">Log</a> object. Use this to log messages.</p>
+        <p><pre class="label label-default">Wrapper::init()</pre> - Called when the wrapper gets loaded from the server. In most cases you can use this method instead of a constructor.</p>
+        <p><pre class="label label-default">Wrapper::onConnect(<a href="#connection" class="underlined">Connection</a> $con)</pre> - Called when a new client is connected and SSL (if configured) is negotiated.</p>
+        <p><pre class="label label-default">Wrapper::onDisconnect(<a href="#connection" class="underlined">Connection</a> $con)</pre> - Called after a client has disconnected from the server.</p>
+        <p><pre class="label label-default">Wrapper::onData(<a href="#connection" class="underlined">Connection</a> $con, $data)</pre> - Called when new data is present from the client described using the connection $con. The $data variable is a string holding the new data. Please keep in mind that if you expect X bytes of data, you may get it in several chunks. So be sure to check buffer the data until you receive the expected amount.</p>
+        <p><pre class="label label-default">Wrapper::onStop()</pre> - Called when the server is being stopped. Think of this as a destructor.</p>
+      </div>
+    </div>
+  </div>
 </div>

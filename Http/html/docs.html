@@ -14,7 +14,7 @@
     <br />
     
     <h2>Starting the server</h2>
-    <p>The framework can manage an arbitrary amount of servers, but please be mindful that if an application running on server A responds slower to requests than an application running on server B, then this can affect the performance of the application on server B. The way you configure what servers to run is through the <code>config.php</code> file. Here is what the default config file looks like:
+    <p>The framework can manage an arbitrary amount of servers, but please be mindful that if an application running on server A responds slower to requests than an application running on server B, then this can affect the performance of the application on server B. The way you configure what servers to run is through the <code>config.php</code> file. Here is what a demo config file looks like:
       <pre><code class="language-php">
 $server_config = array(
     65000 => array(
@@ -39,15 +39,15 @@ $server_config = array(
             )
         ),
         'ssl' => array(
-            'cert_file' => '',
-            'privkey_file' => '',
+            'cert_file' => 'cert.pem',
+            'privkey_file' => 'key.pem',
             'passphrase' => ''
         )
     )
 );
       </code></pre>
 
-      This is an array that describes which ports to listen on and what wrappers to use for each port. You can optionally add wrapper specific config, or if this is not suported use an empty array. The config above starts 3 servers one on each of these ports 65000, 65001 and 65002. On port 65000 we have a WebSocket server, then the RawTcp wrapper is used for port 65001 (this wrapper does nothing basically) and finally we have an HTTP wrapper on port 65002.
+      This is an array that describes which ports to listen on and what wrappers to use for each port. You can optionally add wrapper specific config, or if this is not suported use an empty array. The config above starts 3 servers one on each of these ports 65000, 65001 and 65002. On port 65000 we have a WebSocket server, then the RawTcp wrapper is used for port 65001 (this wrapper does nothing basically) and finally we have a secure HTTP wrapper on port 65002. The files cert.pem and key.pem are in the same format as you would prepare them for NGINX for example. That means putting the complete chain in cert.pem.
     </p>
     <br />
 </div>

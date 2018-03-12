@@ -1,6 +1,7 @@
     <div class="container">
-        <p>Tests were performed using ApacheBench Version 2.3 and PHP 7.2 on AMD Ryzen 7 1700 @ 3.8 GHz. Each test was repeated 3 times and the average result was taken.</p>
+        <p>HTTP tests were performed using ApacheBench Version 2.3, WebSocket tests were performed using Google Chrome 64.0.3282.140 64-bit. PHP version was 7.2 on AMD Ryzen 7 1700 @ 3.8 GHz. Each test was repeated 3 times and the average result was taken.</p>
         <p>
+          <h1>HTTP tests</h1>
             <table class="table">
                 <thead>
                     <tr>
@@ -16,6 +17,12 @@
                         <td>100000</td>
                         <td>50</td>
                         <td>21456</td>
+                    </tr>
+                    <tr>
+                        <td>ReactPHP</td>
+                        <td>100000</td>
+                        <td>50</td>
+                        <td>6981</td>
                     </tr>
                     <tr>
                         <td>Psockets</td>
@@ -43,6 +50,38 @@ server = http.createServer(function (req, res) {
 server.listen(9999);
         </code></pre></p>
         
+        <p>ReactPHP code</p>
+        <p><pre><code class="language-php">
+use Psr\Http\Message\ServerRequestInterface;
+use React\EventLoop\Factory;
+use React\Http\Response;
+use React\Http\Server;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$loop = Factory::create();
+
+$server = new Server(function (ServerRequestInterface $request) {
+    $params = $request->getQueryParams();
+    $result = (int)$params['a'] + (int)$params['b'];
+
+    return new Response(
+        200,
+        array(
+            'Content-Type' => 'text/plain'
+        ),
+        "$result\n"
+    );
+});
+
+$socket = new \React\Socket\Server(isset($argv[1]) ? $argv[1] : '0.0.0.0:0', $loop);
+$server->listen($socket);
+
+echo 'Listening on ' . str_replace('tcp:', 'http:', $socket->getAddress()) . PHP_EOL;
+
+$loop->run();
+        </code></pre></p>
+        
         <p>Psockets code</p>
         <p><pre><code class="language-php">
 class Adder extends HttpComponent {                                                                                                                                                                                                                                            
@@ -56,5 +95,68 @@ class Adder extends HttpComponent {
         return true;                                                                                                                                                                                                                                                           
     }                                                                                                                                                                                                                                                                          
 } 
+        </code></pre></p>
+
+        <p>
+          <h1>WebSocket tests</h1>
+          <h3>For this test I measured the time needed to open 100 connections, send a message to the server and get the response.</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Software</th>
+                        <th>No. of req</th>
+                        <th>Sec</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Node JS</td>
+                        <td>100</td>
+                        <td>4.996</td>
+                    </tr>
+                    <tr>
+                        <td>Psockets</td>
+                        <td>100</td>
+                        <td>5.025</td>
+                    </tr>
+                </tbody>
+            </table>
+        </p>
+        
+        <p>Node JS code</p>
+        <p><pre><code class="language-js">
+const WebSocket = require('ws');
+
+const ws = new WebSocket.Server({
+  port: 8080,
+  handleProtocols: function(protocol, req) {
+    if (protocol == 'echo') {
+      return protocol;
+    } else {
+      return false;
+    }
+  }
+});
+
+ws.on('connection', function connection(ws) {
+  ws.on('message', function incoming(message) {
+    ws.send(message);
+  });
+});
+        </code></pre></p>
+        
+        <p>Psockets code</p>
+        <p><pre><code class="language-php">
+class SimpleEcho extends WebSocketComponent {
+    public static $PROTOCOL = "echo";
+
+    public function onLoad($ip, $port, $host) {
+        $this->server->log->debug("SimpleEcho component loaded on $ip:$port for host $host");
+    }
+
+    public function onMessage($con, $data, $dataType = 'text') {
+        $con->send($data);
+    }
+}
         </code></pre></p>
     </div> <!-- /container -->
